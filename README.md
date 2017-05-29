@@ -1,6 +1,8 @@
 # AWSLambda_RIPEAtlas_CloudWatch [![Build Status](https://travis-ci.org/chriselsen/AWSLambda_RIPEAtlas.svg?branch=master)](https://travis-ci.org/chriselsen/AWSLambda_RIPEAtlas)
 AWS Lambda script to push Status and Latency information from a RIPE Atlas (https://atlas.ripe.net/) health check into AWS CloudWatch
 
+![Screenshot](https://github.com/chriselsen/AWSLambda_RIPEAtlas_CloudWatch/raw/master/RIPE-Atlas_CloudWatch.PNG)
+
 RIPE Atlas employs a global network of probes that measure Internet connectivity and reachability. Status checks let you turn a measurement into a basis for an alert, allowing you to use measurements to gauge the health of your network in a variety of ways. This AWS Lambda script collects information from a RIPE Atlas status check and feeds it into AWS CloudWatch metrics.
 
 **Pre-Requisites:**
