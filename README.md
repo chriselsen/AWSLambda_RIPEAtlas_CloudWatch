@@ -15,6 +15,7 @@ RIPE Atlas employs a global network of probes that measure Internet connectivity
  * Handler: index.handler
  * Timeout : 10 sec
  * Source: In file RIPEAtlas_CloudWatch.nodejs
+ * In source on line 12 change your RIPE Atlas API key (https://atlas.ripe.net/docs/keys/)
 * Configure AWS CloudWatch event rule as trigger
  * Schedule: Fixed rate of 5 minute
  * Function: RIPEAtlas_CloudWatch
