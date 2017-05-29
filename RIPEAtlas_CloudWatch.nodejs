@@ -1,0 +1,116 @@
+exports.handler = (event, context, callback) => {
+    var atlasID = (event.atlasid === undefined ? '1234567' : event.atlasid);
+    var targetName = (event.target === undefined ? 'www.example.com' : event.target);
+    atlasGetStatus(targetName, atlasID, function (Data) {
+        putCloudWatch(Data, function (Data) { 
+            callback(null, "RIPE Atlas values recorded: " + Data);    
+        });    
+    });
+};
+
+function atlasGetStatus(targetName, atlasID, callback) {
+    var atlasApiKey = "123abc45-d123-456a-b4c5-def6789abcde";
+    var URL = "https://atlas.ripe.net/api/v2/measurements/" + atlasID + "/status-check/?key=" + atlasApiKey;
+    sendRequest(URL, targetName, function (Data) { callback(Data); });
+}
+
+function sendRequest(URL, targetName, callback) {
+    var https = require('https');
+	var req = https.get(URL, function (res) {
+        res.on('data', function (data) {
+            if (res.statusCode < '400') { 
+    		    var jsonContent = JSON.parse(data);
+    		    var totalLatency = 0;
+    		    var numProbes = 0;
+    		    var alerts = jsonContent.total_alerts;
+    		    
+    		    for(var myKey in jsonContent.probes) {
+    		        if (jsonContent.probes[myKey].last){
+        		        totalLatency += jsonContent.probes[myKey].last;
+        		        numProbes += 1;
+    		        }
+                }
+                
+    		    callback("{\"Name\":\"" + targetName + "\",\"Alerts\":\"" + alerts + "\",\"Latency\":\"" + (totalLatency / numProbes).toFixed(2) + "\",\"Probes\":\"" + numProbes + "\"}");
+            } else {
+                console.log("Retrying HTTP connection...");
+                sendRequest(URL, targetName, callback);   
+            }
+        });
+	});
+	
+	req.setTimeout(20000);
+	
+	req.on('error', (e) => {
+        console.error(e);
+    });
+}
+
+
+function putCloudWatch(Data, callback){
+    var AWS = require('aws-sdk');
+    AWS.config.region = 'us-west-2';
+    var cloudwatch = new AWS.CloudWatch();
+    
+    var jsonContent = JSON.parse(Data);
+    var targetName = jsonContent.Name;
+    var probeAlerts = jsonContent.Alerts;
+    var probeLatency = jsonContent.Latency;
+    var numProbes = jsonContent.Probes;
+    console.log("Target: " + targetName);
+    console.log("Alerts: " + probeAlerts);
+    console.log("Latency: " + probeLatency);
+    console.log("Probes: " + numProbes);
+    
+    var params = {
+            MetricData: [
+                {
+                    MetricName: 'Alerts', /* required */
+                    Dimensions: [
+                        {
+                            Name: 'Target', /* required */
+                            Value: targetName /* required */
+                        },
+                    ],
+                    Timestamp: + Math.floor(new Date() / 1000),
+                    Unit: 'None',
+                    Value: + probeAlerts 
+                },
+                {
+                    MetricName: 'Latency', /* required */
+                    Dimensions: [
+                        {
+                            Name: 'Target', /* required */
+                            Value: targetName /* required */
+                        },
+                    ],
+                    Timestamp: + Math.floor(new Date() / 1000),
+                    Unit: 'None',
+                    Value: + probeLatency 
+                },
+                {
+                    MetricName: 'Probes', /* required */
+                    Dimensions: [
+                        {
+                            Name: 'Target', /* required */
+                            Value: targetName /* required */
+                        },
+                    ],
+                    Timestamp: + Math.floor(new Date() / 1000),
+                    Unit: 'None',
+                    Value: + numProbes 
+                }
+            ],
+            Namespace: 'RIPE-Atlas' /* required */
+        };
+        
+        cloudwatch.putMetricData(params, function(err, data) {
+            if (err) { 
+                console.log(err, err.stack);
+                callback("Data Push Failed");
+            } else {
+                console.log(data);
+                callback("Data Push Succeded");
+            }
+        });
+}
