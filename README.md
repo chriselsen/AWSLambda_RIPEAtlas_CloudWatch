@@ -1,4 +1,4 @@
-# AWSLambda_RIPEAtlas_CloudWatch [![Build Status](https://travis-ci.org/chriselsen/AWSLambda_RIPEAtlas.svg?branch=master)](https://travis-ci.org/chriselsen/AWSLambda_RIPEAtlas)
+# AWSLambda_RIPEAtlas_CloudWatch [![Build Status](https://travis-ci.org/chriselsen/AWSLambda_RIPEAtlas_CloudWatch.svg?branch=master)](https://travis-ci.org/chriselsen/AWSLambda_RIPEAtlas_CloudWatch)
 AWS Lambda script to push Status and Latency information from a RIPE Atlas (https://atlas.ripe.net/) health check into AWS CloudWatch
 
 ![Screenshot](https://github.com/chriselsen/AWSLambda_RIPEAtlas_CloudWatch/raw/master/RIPE-Atlas_CloudWatch.PNG)
