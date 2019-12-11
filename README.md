@@ -7,7 +7,7 @@ RIPE Atlas employs a global network of probes that measure Internet connectivity
 
 **Pre-Requisites:**
 * Role for Lambda that allows put-metric access to Amazon CloudWatch
-* RIPE Atals account with a "status check" measurement (https://atlas.ripe.net/docs/api/v2/manual/measurements/status-checks.html)
+* RIPE Atlas account with a "status check" measurement (https://atlas.ripe.net/docs/api/v2/manual/measurements/status-checks.html)
 
 **How-To:**
 * Create AWS Lambda function
